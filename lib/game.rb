@@ -21,6 +21,8 @@ class Game
   #play should only be script. only test methods inside
   def play
     make_players
+    set_active_player
+    puts "#{active_player.name} goes first!"
     build_board
     puts ' 1  2  3  4  5  6  7 '
   end
@@ -38,6 +40,10 @@ class Game
 
   def set_active_player
     self.active_player = [@p1, @p2].sample 
+  end
+
+  def verify_input(input)
+    return input.to_i if input.match?(/^[0-7]$/)
   end
 
 end

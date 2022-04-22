@@ -56,4 +56,26 @@ describe Game do
     end
   end
 
+  describe '#verify_input' do
+    subject(:game_verify) { described_class.new }
+
+    context 'when user input is valid' do
+      it 'returns input' do
+        input = '5' 
+        valid_input = game_verify.verify_input(input)
+        expect(valid_input).to eq(5)
+      end 
+    end
+
+    context 'when user input is invalid ' do
+      it 'returns nil' do
+        input = 'f'
+        invalid_input = game_verify.verify_input(input)
+        expect(invalid_input).to eq(nil)
+      end
+    end
+  end
+
+
+
 end
