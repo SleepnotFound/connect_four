@@ -3,27 +3,26 @@ require_relative 'player'
 
 class Game
   include Colors
-  attr_accessor :board, :p1, :p2
+  attr_accessor :board, :p1, :p2, :active_player
 
   def initialize
     @board = Array.new(6) { Array.new(7) { blank_space } }
     @p1 = Player.new(nil, red_piece)
     @p2 = Player.new(nil, yellow_piece)
+    @active_player = nil
   end
 
   def build_board
     board.each do |row| 
       puts row.reduce { |row, cell| row + cell }
     end
-    #puts ' 1  2  3  4  5  6  7 '
   end
 
   #play should only be script. only test methods inside
   def play
+    make_players
     build_board
     puts ' 1  2  3  4  5  6  7 '
-    make_players
-    p p1
   end
 
   def make_players
@@ -37,7 +36,11 @@ class Game
     gets.chomp
   end
 
+  def set_active_player
+    self.active_player = [@p1, @p2].sample 
+  end
+
 end
 
-game = Game.new
-game.play
+#game = Game.new
+#game.play
