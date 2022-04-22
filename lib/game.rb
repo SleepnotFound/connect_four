@@ -25,6 +25,7 @@ class Game
     puts "#{active_player.name} goes first!"
     build_board
     puts ' 1  2  3  4  5  6  7 '
+    user_turn
   end
 
   def make_players
@@ -43,7 +44,20 @@ class Game
   end
 
   def verify_input(input)
-    return input.to_i if input.match?(/^[0-7]$/)
+    return input.to_i if input.match?(/^[1-7]$/)
+  end
+
+  def user_turn 
+    input = nil
+    until input 
+      input = verify_input(user_input)
+    end
+    input
+  end
+
+  def user_input
+    puts "Enter a number between 1-7"
+    gets.chomp
   end
 
 end

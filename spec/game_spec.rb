@@ -76,6 +76,31 @@ describe Game do
     end
   end
 
+  describe '#user_turn' do
+    subject(:game_loop) { described_class.new }
+    context 'when user input is valid' do
+      it 'exits loop and returns 5' do
+        allow(game_loop).to receive(:user_input).and_return('5')
+        input = game_loop.user_turn
+        expect(input).to eq(5)
+      end
+    end
 
+    context 'when user input is invalid then valid' do
+      it 'loops once, then exits loop and returns 7' do
+        allow(game_loop).to receive(:user_input).and_return('8', '7')
+        input = game_loop.user_turn
+        expect(input).to eq(7)
+      end
+    end
+
+    context 'when user input is invalid, invalid, valid, invalid' do
+      it 'loops twice, then exits loop and returns 1' do
+        allow(game_loop).to receive(:user_input).and_return('0', 'f', '1', 'u')
+        input = game_loop.user_turn
+        expect(input).to eq(1)
+      end
+    end
+  end
 
 end
