@@ -103,4 +103,55 @@ describe Game do
     end
   end
 
+  describe '#insert_piece' do
+    subject(:populate_game) { described_class.new }
+    context 'when player 1 chooses column 1 with empty board' do
+      let(:player_1) { double('player', name: 'Captain', piece: " \e[31m\u25CF\e[0m ") }
+      before do
+        populate_game.active_player = player_1
+      end
+      it 'insert red piece at row 6, column 1' do
+        input = 1
+        populate_game.insert_piece(input)
+        spot = populate_game.board[5][0]
+        expect(spot).to eq(" \e[31m\u25CF\e[0m ")
+      end
+    end
+
+    context 'when player 1 chooses column 1 then player 2 chooses same column(1)' do
+      let(:player_1) { double('player', name: 'Captain', piece: " \e[31m\u25CF\e[0m ") }
+      let(:player_2) { double('player', name: 'Crunch', piece: " \e[33m\u25CF\e[0m ") }
+      before do
+        populate_game.active_player = player_1
+        red_player_input = 1
+        populate_game.insert_piece(red_player_input)
+        populate_game.active_player = player_2
+      end
+      it 'insert yellow piece at row 5, column 1' do
+        yellow_player_input = 1
+        populate_game.insert_piece(yellow_player_input)
+        spot = populate_game.board[4][0]
+        expect(spot).to eq(" \e[33m\u25CF\e[0m ")
+      end
+    end
+
+    context 'when player 2 chooses column 7 last spot(very top)' do
+      let(:player_2) { double('player', name: 'Crunch', piece: " \e[33m\u25CF\e[0m ") }
+      before do
+        populate_game.board[5][6] = " \e[31m\u25CF\e[0m "
+        populate_game.board[4][6] = " \e[33m\u25CF\e[0m "
+        populate_game.board[3][6] = " \e[31m\u25CF\e[0m "
+        populate_game.board[2][6] = " \e[33m\u25CF\e[0m "
+        populate_game.board[1][6] = " \e[31m\u25CF\e[0m "
+        populate_game.active_player = player_2
+      end
+      it 'insert yellow piece at row 1, column 7' do
+        input = 7
+        populate_game.insert_piece(input)
+        spot = populate_game.board[0][6]
+        expect(spot).to eq(" \e[33m\u25CF\e[0m ")
+      end
+    end
+  end
+
 end

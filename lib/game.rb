@@ -59,7 +59,16 @@ class Game
     puts "Enter a number between 1-7"
     gets.chomp
   end
-
+  
+  def insert_piece(input)
+    #reverse_each starts at lowest row towards the highest row
+    board.reverse_each do |row|
+      if row[input - 1] == blank_space 
+        row[input - 1] = active_player.piece
+        break
+      end
+    end
+  end
 end
 
 #game = Game.new
