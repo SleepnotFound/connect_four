@@ -1,4 +1,6 @@
 require './lib/game'
+require './lib/colors'
+include Colors
 
 describe Game do
   describe '#build_board' do
@@ -7,7 +9,7 @@ describe Game do
       
       it 'ouputs 6 rows of empty spaces' do
         row = ""
-        7.times { row += " \u25CB " }
+        7.times { row += blank_space }
         expect(game_build).to receive(:puts).with(row).exactly(6).times
         game_build.build_board
       end
@@ -105,8 +107,8 @@ describe Game do
 
   describe '#insert_piece' do
     subject(:populate_game) { described_class.new }
-    let(:player_1) { double('player', name: 'red', piece: " \e[31m\u25CF\e[0m ") }
-    let(:player_2) { double('player', name: 'yellow', piece: " \e[33m\u25CF\e[0m ") }
+    let(:player_1) { double('player', name: 'red', piece: red_piece) }
+    let(:player_2) { double('player', name: 'yellow', piece: yellow_piece) }
     context 'when player 1 chooses column 1 with empty board' do
       before do
         populate_game.active_player = player_1
@@ -115,7 +117,7 @@ describe Game do
         input = 1
         populate_game.insert_piece(input)
         spot = populate_game.board[5][0]
-        expect(spot).to eq(" \e[31m\u25CF\e[0m ")
+        expect(spot).to eq(red_piece)
       end
     end
 
@@ -130,32 +132,32 @@ describe Game do
         yellow_player_input = 1
         populate_game.insert_piece(yellow_player_input)
         spot = populate_game.board[4][0]
-        expect(spot).to eq(" \e[33m\u25CF\e[0m ")
+        expect(spot).to eq(yellow_piece)
       end
     end
 
     context 'when player 2 chooses column 7 last spot(very top)' do
       before do
-        populate_game.board[5][6] = " \e[31m\u25CF\e[0m "
-        populate_game.board[4][6] = " \e[33m\u25CF\e[0m "
-        populate_game.board[3][6] = " \e[31m\u25CF\e[0m "
-        populate_game.board[2][6] = " \e[33m\u25CF\e[0m "
-        populate_game.board[1][6] = " \e[31m\u25CF\e[0m "
+        populate_game.board[5][6] = red_piece
+        populate_game.board[4][6] = yellow_piece
+        populate_game.board[3][6] = red_piece
+        populate_game.board[2][6] = yellow_piece
+        populate_game.board[1][6] = red_piece
         populate_game.active_player = player_2
       end
       it 'insert yellow piece at row 1, column 7' do
         input = 7
         populate_game.insert_piece(input)
         spot = populate_game.board[0][6]
-        expect(spot).to eq(" \e[33m\u25CF\e[0m ")
+        expect(spot).to eq(yellow_piece)
       end
     end
   end
 
   describe '#switch_active_player' do
     subject(:game_switch) { described_class.new }
-    let(:player_1) { double('player', name: 'Capitan', piece: " \e[31m\u25CF\e[0m ") }
-    let(:player_2) { double('player', name: 'Ship', piece: " \e[33m\u25CF\e[0m ") }
+    let(:player_1) { double('player', name: 'Capitan', piece: red_piece) }
+    let(:player_2) { double('player', name: 'Ship', piece: yellow_piece) }
     context 'when player 1\'s turn is finish' do
       before do
         game_switch.p1 = player_1
@@ -183,11 +185,11 @@ describe Game do
     end
   end
 
-  describe 'full_board?' do
+  describe '#full_board?' do
     subject(:game_full) { described_class.new }
     context 'when board is full' do
       it 'returns true' do
-        game_full.board = Array.new(6) { Array.new(7) { " \e[33m\u25CF\e[0m " } }
+        game_full.board = Array.new(6) { Array.new(7) { yellow_piece } }
         is_full = game_full.full_board?
         expect(is_full).to eq(true)
       end
@@ -201,4 +203,50 @@ describe Game do
     end
   end
 
+  describe '#column_full?' do
+    subject(:game_columns) { described_class.new }
+    context 'when user inputs 3, but column cannot hold more pieces' do
+      it 'returns false' do
+        input = 3
+        game_columns.board[0][input - 1] = yellow_piece
+        column_full = game_columns.column_full?(input)
+        expect(column_full).to eq(true)
+      end
+    end
+
+    context 'when user inputs 6, and column can hold another piece' do
+      it 'returns false' do
+        input = 6
+        column_full = game_columns.column_full?(input)
+        expect(column_full).not_to eq(true)
+      end
+    end
+  end
+
+  describe '#row_win?' do
+    describe 'given a red player piece' do 
+      subject(:game_check) { described_class.new }
+      let(:player_1) { double('player', name: 'Hungry', piece: red_piece) }
+      context 'when top row is all red pieces' do
+        before do
+          game_check.active_player = player_1
+          game_check.board[0].map! { |e| e = red_piece }
+        end
+        it 'returns true' do
+          expect(game_check.row_win?).to eq(true) 
+        end
+      end
+
+      context 'when a row contains 3 red, 1 yellow, 3 red pieces' do
+        before do
+          game_check.active_player = player_1
+          game_check.board[3].map! { |e| e = red_piece }
+          game_check.board[3][3] = yellow_piece
+        end
+        it 'returns false' do
+          expect(game_check.row_win?).to eq(false)
+        end
+      end
+    end
+  end
 end

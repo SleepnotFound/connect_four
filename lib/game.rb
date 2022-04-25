@@ -22,9 +22,9 @@ class Game
   def play
     make_players
     set_active_player
-    puts "#{active_player.name} goes first!"
     build_board
     puts ' 1  2  3  4  5  6  7 '
+    puts "#{active_player.name} goes first!"
     user_turn
   end
 
@@ -79,6 +79,26 @@ class Game
       return false if row.any? { |spot| spot == blank_space }
     end
     true
+  end
+
+  def column_full?(input)
+    return false if board[0][input - 1] == blank_space
+    true
+  end
+
+  def row_win?
+    board.each do |row|
+      count = 0
+      row.each do |cell|
+        if cell == active_player.piece
+          count += 1
+        else 
+          count = 0
+        end
+        break if count == 4 
+      end
+      return count == 4 ? true : false
+    end
   end
 end
 
