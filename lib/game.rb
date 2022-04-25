@@ -73,6 +73,13 @@ class Game
   def switch_active_player 
     self.active_player = active_player == p1 ? p2 : p1 
   end
+
+  def full_board? 
+    board.each do |row| 
+      return false if row.any? { |spot| spot == blank_space }
+    end
+    true
+  end
 end
 
 #game = Game.new

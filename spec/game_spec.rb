@@ -157,7 +157,6 @@ describe Game do
     let(:player_1) { double('player', name: 'Capitan', piece: " \e[31m\u25CF\e[0m ") }
     let(:player_2) { double('player', name: 'Ship', piece: " \e[33m\u25CF\e[0m ") }
     context 'when player 1\'s turn is finish' do
-      
       before do
         game_switch.p1 = player_1
         game_switch.p2 = player_2
@@ -178,8 +177,26 @@ describe Game do
       end
       it 'switch over to player 1\'s turn' do
         game_switch.switch_active_player
-        active = game-switch.active_player
+        active = game_switch.active_player
         expect(active).to eq(player_1)
+      end
+    end
+  end
+
+  describe 'full_board?' do
+    subject(:game_full) { described_class.new }
+    context 'when board is full' do
+      it 'returns true' do
+        game_full.board = Array.new(6) { Array.new(7) { " \e[33m\u25CF\e[0m " } }
+        is_full = game_full.full_board?
+        expect(is_full).to eq(true)
+      end
+    end
+
+    context 'when board is NOT full' do
+      it 'returns false' do
+        is_full = game_full.full_board?
+        expect(is_full).not_to eq(true)
       end
     end
   end
