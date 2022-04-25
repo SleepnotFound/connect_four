@@ -87,8 +87,8 @@ class Game
   end
 
   def row_win?
-    board.each do |row|
-      count = 0
+    count = 0
+    board.reverse.each do |row|
       row.each do |cell|
         if cell == active_player.piece
           count += 1
@@ -97,8 +97,25 @@ class Game
         end
         break if count == 4 
       end
-      return count == 4 ? true : false
+      break if count == 4
     end
+    return count == 4 ? true : false
+  end
+
+  def column_win?
+    count = 0
+    7.times do |c|
+      6.times do |r|
+        if board[r][c] == active_player.piece
+          count += 1
+        else
+          count = 0
+        end
+        break if count == 4
+      end
+      break if count == 4
+    end
+    return count == 4 ? true : false
   end
 end
 

@@ -224,20 +224,21 @@ describe Game do
   end
 
   describe '#row_win?' do
-    describe 'given a red player piece' do 
+    describe 'given a red piece as active_player' do 
       subject(:game_check) { described_class.new }
       let(:player_1) { double('player', name: 'Hungry', piece: red_piece) }
       context 'when top row is all red pieces' do
         before do
           game_check.active_player = player_1
-          game_check.board[0].map! { |e| e = red_piece }
+          row = 3                                                           #index 0-5 all should work
+          game_check.board[row].map! { |e| e = red_piece }
         end
         it 'returns true' do
           expect(game_check.row_win?).to eq(true) 
         end
       end
 
-      context 'when a row contains 3 red, 1 yellow, 3 red pieces' do
+      context 'when a row contains 3 reds, 1 yellow, 3 reds' do
         before do
           game_check.active_player = player_1
           game_check.board[3].map! { |e| e = red_piece }
@@ -245,6 +246,24 @@ describe Game do
         end
         it 'returns false' do
           expect(game_check.row_win?).to eq(false)
+        end
+      end
+    end
+  end
+
+  describe '#column_win?' do
+    describe 'given a yellow piece as active_player' do
+      subject(:game_check) { described_class.new }
+      let(:player) { double('player', name: 'ughtests', piece: yellow_piece) }
+      context 'when a column contains 2 reds, 4 yellows' do
+        before do
+          game_check.active_player = player
+          column = 6                                                            #index 0-6 should all work
+          2.times { |i| game_check.board[5 - i][column] = red_piece }
+          4.times { |i| game_check.board[i][column] = yellow_piece }
+        end
+        it 'returns true' do
+          expect(game_check.column_win?).to eq(true)
         end
       end
     end
