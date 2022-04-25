@@ -105,8 +105,9 @@ describe Game do
 
   describe '#insert_piece' do
     subject(:populate_game) { described_class.new }
+    let(:player_1) { double('player', name: 'red', piece: " \e[31m\u25CF\e[0m ") }
+    let(:player_2) { double('player', name: 'yellow', piece: " \e[33m\u25CF\e[0m ") }
     context 'when player 1 chooses column 1 with empty board' do
-      let(:player_1) { double('player', name: 'Captain', piece: " \e[31m\u25CF\e[0m ") }
       before do
         populate_game.active_player = player_1
       end
@@ -119,8 +120,6 @@ describe Game do
     end
 
     context 'when player 1 chooses column 1 then player 2 chooses same column(1)' do
-      let(:player_1) { double('player', name: 'Captain', piece: " \e[31m\u25CF\e[0m ") }
-      let(:player_2) { double('player', name: 'Crunch', piece: " \e[33m\u25CF\e[0m ") }
       before do
         populate_game.active_player = player_1
         red_player_input = 1
@@ -136,7 +135,6 @@ describe Game do
     end
 
     context 'when player 2 chooses column 7 last spot(very top)' do
-      let(:player_2) { double('player', name: 'Crunch', piece: " \e[33m\u25CF\e[0m ") }
       before do
         populate_game.board[5][6] = " \e[31m\u25CF\e[0m "
         populate_game.board[4][6] = " \e[33m\u25CF\e[0m "
@@ -150,6 +148,38 @@ describe Game do
         populate_game.insert_piece(input)
         spot = populate_game.board[0][6]
         expect(spot).to eq(" \e[33m\u25CF\e[0m ")
+      end
+    end
+  end
+
+  describe '#switch_active_player' do
+    subject(:game_switch) { described_class.new }
+    let(:player_1) { double('player', name: 'Capitan', piece: " \e[31m\u25CF\e[0m ") }
+    let(:player_2) { double('player', name: 'Ship', piece: " \e[33m\u25CF\e[0m ") }
+    context 'when player 1\'s turn is finish' do
+      
+      before do
+        game_switch.p1 = player_1
+        game_switch.p2 = player_2
+        game_switch.active_player = player_1
+      end
+      it 'switch active player to player 2' do
+        game_switch.switch_active_player
+        active = game_switch.active_player
+        expect(active).to eq(player_2)
+      end
+    end
+
+    context 'when player 2\'s turn is completed' do
+      before do
+        game_switch.p1 = player_1
+        game_switch.p2 = player_2
+        game_switch.active_player = player_2
+      end
+      it 'switch over to player 1\'s turn' do
+        game_switch.switch_active_player
+        active = game-switch.active_player
+        expect(active).to eq(player_1)
       end
     end
   end

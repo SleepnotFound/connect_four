@@ -69,6 +69,10 @@ class Game
       end
     end
   end
+
+  def switch_active_player 
+    self.active_player = active_player == p1 ? p2 : p1 
+  end
 end
 
 #game = Game.new
