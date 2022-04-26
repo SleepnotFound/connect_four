@@ -3,23 +3,10 @@ require './lib/colors'
 include Colors
 
 describe Game do
-  describe '#build_board' do
-    context 'when building board' do
-      subject(:game_build) { described_class.new }
-      
-      it 'ouputs 6 rows of empty spaces' do
-        row = ""
-        7.times { row += blank_space }
-        expect(game_build).to receive(:puts).with(row).exactly(6).times
-        game_build.build_board
-      end
-    end
-  end
-
   describe "#make_players" do
+    subject(:game_players) { described_class.new }
+    
     context 'when make_players is called' do 
-      subject(:game_players) { described_class.new }
-
       it 'sets names for p1 and p2' do
         allow(game_players).to receive(:set_names).and_return("Captain", "Crunch")
         game_players.make_players
@@ -151,11 +138,7 @@ describe Game do
 
     context 'when player 2 chooses column 7 last spot(very top)' do
       before do
-        populate_game.board[5][6] = red_piece
-        populate_game.board[4][6] = yellow_piece
-        populate_game.board[3][6] = red_piece
-        populate_game.board[2][6] = yellow_piece
-        populate_game.board[1][6] = red_piece
+        5.downto(1) { |i| populate_game.board[i][6] = red_piece}
         populate_game.active_player = player_2
       end
       it 'insert yellow piece at row 1, column 7' do
@@ -198,20 +181,37 @@ describe Game do
     end
   end
 
-  describe '#full_board?' do
-    subject(:game_full) { described_class.new }
-    context 'when board is full' do
+  describe '#game_over?' do
+    subject(:game_finish) { described_class.new }
+    context 'when a full board is discovered' do
       it 'returns true' do
-        game_full.board = Array.new(6) { Array.new(7) { yellow_piece } }
-        is_full = game_full.full_board?
-        expect(is_full).to eq(true)
+        game_finish.board = Array.new(6) { Array.new(7) { yellow_piece } }
+        expect(game_finish.game_over?).to eq(true)
       end
     end
 
-    context 'when board is NOT full' do
-      it 'returns false' do
-        is_full = game_full.full_board?
-        expect(is_full).not_to eq(true)
+    context 'when a win has been discovered' do
+      before do
+        game_finish.active_player = game_finish.p1
+        row_start = (0..2).to_a.sample
+        column_start = (3..6).to_a.sample
+        4.times { |i| game_finish.board[i + row_start][column_start - i] = red_piece }
+      end
+      it 'returns true' do
+        expect(game_finish.game_over?).to eq(true)
+      end
+    end
+  end
+
+  describe '#build_board' do
+    context 'when building board' do
+      subject(:game_build) { described_class.new }
+    
+      it 'ouputs 6 rows of empty spaces' do
+        row = ""
+        7.times { row += blank_space }
+        expect(game_build).to receive(:puts).with(row).exactly(6).times
+        game_build.build_board
       end
     end
   end
@@ -236,6 +236,24 @@ describe Game do
     end
   end
 
+  describe '#full_board?' do
+    subject(:game_full) { described_class.new }
+    context 'when board is full' do
+      it 'returns true' do
+        game_full.board = Array.new(6) { Array.new(7) { yellow_piece } }
+        is_full = game_full.full_board?
+        expect(is_full).to eq(true)
+      end
+    end
+
+    context 'when board is NOT full' do
+      it 'returns false' do
+        is_full = game_full.full_board?
+        expect(is_full).not_to eq(true)
+      end
+    end
+  end
+
   describe '#row_win?' do
     describe 'given a red piece as active_player' do 
       subject(:game_check) { described_class.new }
@@ -243,7 +261,7 @@ describe Game do
       context 'when top row is all red pieces' do
         before do
           game_check.active_player = player_1
-          row = 3                                                               #index 0-5 all should work
+          row = (0..5).to_a.sample                                              #index 0-5 all should work
           game_check.board[row].map! { |e| e = red_piece }
         end
         it 'returns true' do
@@ -271,7 +289,7 @@ describe Game do
       context 'when a column contains 2 reds, 4 yellows' do
         before do
           game_check.active_player = player
-          column = 6                                                            #index 0-6 should all work
+          column = (0..6).to_a.sample                                           #index 0-6 should all work
           2.times { |i| game_check.board[5 - i][column] = red_piece }
           4.times { |i| game_check.board[i][column] = yellow_piece }
         end
@@ -311,27 +329,4 @@ describe Game do
       end
     end
   end
-
-  describe '#game_over?' do
-    subject(:game_finish) { described_class.new }
-    context 'when a full board is discovered' do
-      it 'returns true' do
-        game_finish.board = Array.new(6) { Array.new(7) { yellow_piece } }
-        expect(game_finish.game_over?).to eq(true)
-      end
-    end
-
-    context 'when a win has been discovered' do
-      before do
-        game_finish.active_player = game_finish.p1
-        row_start = (0..2).to_a.sample
-        column_start = (3..6).to_a.sample
-        4.times { |i| game_finish.board[i + row_start][column_start - i] = red_piece }
-      end
-      it 'returns true' do
-        expect(game_finish.game_over?).to eq(true)
-      end
-    end
-  end
-
 end

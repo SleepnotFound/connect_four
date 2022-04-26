@@ -42,8 +42,6 @@ class Game < Board
     self.p1.name = set_names(1)
     self.p2.name = set_names(2)
   end
-  
-  
 
   def set_active_player
     self.active_player = [@p1, @p2].sample 
