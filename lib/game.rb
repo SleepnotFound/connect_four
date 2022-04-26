@@ -22,10 +22,22 @@ class Game
   def play
     make_players
     set_active_player
-    build_board
-    puts ' 1  2  3  4  5  6  7 '
     puts "#{active_player.name} goes first!"
-    user_turn
+    
+    loop do 
+      build_board
+      puts ' 1  2  3  4  5  6  7 '
+      puts "#{active_player.name} goes next!(#{active_player.piece})"
+      insert_piece(user_turn)
+      break if game_over?
+      switch_active_player
+    end
+    if full_board?
+      puts 'Tie'
+    else
+      build_board
+      puts "#{active_player.name} has won!"
+    end
   end
 
   def make_players
@@ -51,8 +63,15 @@ class Game
     input = nil
     until input 
       input = verify_input(user_input)
+      input = verify_column(input) if input
     end
     input
+  end
+
+  def verify_column(input)
+    return input unless column_full?(input)
+    puts 'Column is full! try again'
+    nil
   end
 
   def user_input
@@ -126,19 +145,23 @@ class Game
           match = board[r + i][c + i] == active_player.piece
           four_piece.push << match
         end
-        return true if arr.all?
-        arr = []
+        return true if four_piece.all?
+        four_piece = []
       end
       3.upto(6) do |c|
         4.times do |i|
           match = board[r + i][c - i] == active_player.piece
           four_piece.push << match
         end
-        return true if arr.all?
-        arr = []
+        return true if four_piece.all?
+        four_piece = []
       end
     end
     false
+  end
+
+  def game_over?
+    full_board? || row_win? || column_win? || diagonal_win?
   end
 
 end

@@ -105,6 +105,19 @@ describe Game do
     end
   end
 
+  describe '#verify_column' do
+    subject(:game_column) { described_class.new }
+    context 'when user inputs 1, but column 1 is full' do
+      it 'returns nil' do
+        allow(game_column).to receive(:column_full?).and_return(true)
+        input = 1
+        game_column.board[0][input - 1] = yellow_piece
+        full = game_column.verify_column(input)
+        expect(full).to eq(nil)
+      end
+    end
+  end
+
   describe '#insert_piece' do
     subject(:populate_game) { described_class.new }
     let(:player_1) { double('player', name: 'red', piece: red_piece) }
@@ -276,8 +289,8 @@ describe Game do
       context 'when 4 reds are diagonally rightward(\\)' do
         before do
           game_check.active_player = player
-          row_start = 2                                                         #index 0-2. start of row diagonal 
-          column_start = 3                                                      #index 0-3. start of column diagonal
+          row_start = (0..2).to_a.sample                                        #index 0-2. start of row diagonal 
+          column_start = (0..3).to_a.sample                                     #index 0-3. start of column diagonal
           4.times { |i| game_check.board[i + row_start][i + column_start] = red_piece }
         end
         it 'returns true' do
@@ -288,13 +301,35 @@ describe Game do
       context 'when 4 reds are diagonally leftwards(/)' do
         before do
           game_check.active_player = player
-          row_start = 2                                                         #index 0-2. start of row diagonal
-          column_start = 3                                                      #index 3-6. start of column diagonal
+          row_start = (0..2).to_a.sample                                        #index 0-2. start of row diagonal
+          column_start = (3..6).to_a.sample                                     #index 3-6. start of column diagonal
           4.times { |i| game_check.board[i + row_start][column_start - i] = red_piece }
         end
         it 'returns true' do
           expect(game_check.diagonal_win?).to eq(true)
         end
+      end
+    end
+  end
+
+  describe '#game_over?' do
+    subject(:game_finish) { described_class.new }
+    context 'when a full board is discovered' do
+      it 'returns true' do
+        game_finish.board = Array.new(6) { Array.new(7) { yellow_piece } }
+        expect(game_finish.game_over?).to eq(true)
+      end
+    end
+
+    context 'when a win has been discovered' do
+      before do
+        game_finish.active_player = game_finish.p1
+        row_start = (0..2).to_a.sample
+        column_start = (3..6).to_a.sample
+        4.times { |i| game_finish.board[i + row_start][column_start - i] = red_piece }
+      end
+      it 'returns true' do
+        expect(game_finish.game_over?).to eq(true)
       end
     end
   end
