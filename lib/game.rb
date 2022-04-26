@@ -119,17 +119,26 @@ class Game
   end
 
   def diagonal_win?
-    count = 0
-    6.times do |r|
-      7.times do |c|
-        if board[r][c] == active_player.piece
-          count += 1
-        else
-          count = 0
+    four_piece = []
+    0.upto(2) do |r|
+      0.upto(3) do |c|
+        4.times do |i|
+          match = board[r + i][c + i] == active_player.piece
+          four_piece.push << match
         end
-
+        return true if arr.all?
+        arr = []
+      end
+      3.upto(6) do |c|
+        4.times do |i|
+          match = board[r + i][c - i] == active_player.piece
+          four_piece.push << match
+        end
+        return true if arr.all?
+        arr = []
       end
     end
+    false
   end
 
 end
