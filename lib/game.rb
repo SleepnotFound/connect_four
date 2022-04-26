@@ -33,7 +33,7 @@ class Game
       switch_active_player
     end
     if full_board?
-      puts 'Tie'
+      puts 'Tie!'
     else
       build_board
       puts "#{active_player.name} has won!"
@@ -163,8 +163,4 @@ class Game
   def game_over?
     full_board? || row_win? || column_win? || diagonal_win?
   end
-
 end
-
-#game = Game.new
-#game.play
