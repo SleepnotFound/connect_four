@@ -1,7 +1,8 @@
 require_relative 'colors'
 require_relative 'player'
+require_relative 'board'
 
-class Game
+class Game < Board
   include Colors
   attr_accessor :board, :p1, :p2, :active_player
 
@@ -12,13 +13,6 @@ class Game
     @active_player = nil
   end
 
-  def build_board
-    board.each do |row| 
-      puts row.reduce { |row, cell| row + cell }
-    end
-  end
-
-  #play should only be script. only test methods inside
   def play
     make_players
     set_active_player
@@ -32,6 +26,10 @@ class Game
       break if game_over?
       switch_active_player
     end
+    show_results
+  end
+
+  def show_results
     if full_board?
       puts 'Tie!'
     else
@@ -41,15 +39,11 @@ class Game
   end
 
   def make_players
-    #set names for p1 and p2
     self.p1.name = set_names(1)
     self.p2.name = set_names(2)
   end
-  #set_names should only have puts and gets to skip testing phase
-  def set_names(id)
-    puts "enter name for player #{id}"
-    gets.chomp
-  end
+  
+  
 
   def set_active_player
     self.active_player = [@p1, @p2].sample 
@@ -73,14 +67,8 @@ class Game
     puts 'Column is full! try again'
     nil
   end
-
-  def user_input
-    puts "Enter a number between 1-7"
-    gets.chomp
-  end
   
   def insert_piece(input)
-    #reverse_each starts at lowest row towards the highest row
     board.reverse_each do |row|
       if row[input - 1] == blank_space 
         row[input - 1] = active_player.piece
@@ -93,74 +81,19 @@ class Game
     self.active_player = active_player == p1 ? p2 : p1 
   end
 
-  def full_board? 
-    board.each do |row| 
-      return false if row.any? { |spot| spot == blank_space }
-    end
-    true
-  end
-
-  def column_full?(input)
-    return false if board[0][input - 1] == blank_space
-    true
-  end
-
-  def row_win?
-    count = 0
-    5.downto(0) do |r|
-      7.times do |c|
-        if board[r][c] == active_player.piece
-          count += 1
-        else 
-          count = 0
-        end
-        break if count == 4 
-      end
-      break if count == 4
-    end
-    return count == 4 ? true : false
-  end
-
-  def column_win?
-    count = 0
-    7.times do |c|
-      6.times do |r|
-        if board[r][c] == active_player.piece
-          count += 1
-        else
-          count = 0
-        end
-        break if count == 4
-      end
-      break if count == 4
-    end
-    return count == 4 ? true : false
-  end
-
-  def diagonal_win?
-    four_piece = []
-    0.upto(2) do |r|
-      0.upto(3) do |c|
-        4.times do |i|
-          match = board[r + i][c + i] == active_player.piece
-          four_piece.push << match
-        end
-        return true if four_piece.all?
-        four_piece = []
-      end
-      3.upto(6) do |c|
-        4.times do |i|
-          match = board[r + i][c - i] == active_player.piece
-          four_piece.push << match
-        end
-        return true if four_piece.all?
-        four_piece = []
-      end
-    end
-    false
-  end
-
   def game_over?
     full_board? || row_win? || column_win? || diagonal_win?
+  end
+  
+  private
+
+  def user_input
+    puts "Enter a number between 1-7"
+    gets.chomp
+  end
+
+  def set_names(id)
+    puts "enter name for player #{id}"
+    gets.chomp
   end
 end
