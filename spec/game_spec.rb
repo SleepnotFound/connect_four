@@ -230,7 +230,7 @@ describe Game do
       context 'when top row is all red pieces' do
         before do
           game_check.active_player = player_1
-          row = 3                                                           #index 0-5 all should work
+          row = 3                                                               #index 0-5 all should work
           game_check.board[row].map! { |e| e = red_piece }
         end
         it 'returns true' do
@@ -264,6 +264,24 @@ describe Game do
         end
         it 'returns true' do
           expect(game_check.column_win?).to eq(true)
+        end
+      end
+    end
+  end
+
+  describe '#diagonal_win?' do
+    describe 'given a red piece as active_player' do
+      subject(:game_check) { described_class.new }
+      let(:player) { double('player', name: 'ughtests', piece: red_piece) }
+      context 'when a 4 reds are diagonal across board' do
+        before do
+          game_check.active_player = player
+          row_start = 0                                                         #index 0-6. start of row diagonal 
+          column_start = 0                                                      #index 0-5. start of column diagonal
+          4.times { |i| game_check.board[i + row_start][i + column_start] = red_piece}
+        end
+        it 'returns true' do
+          expect(game_check.diagonal_win?).to eq(true)
         end
       end
     end

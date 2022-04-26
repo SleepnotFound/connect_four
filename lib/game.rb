@@ -88,9 +88,9 @@ class Game
 
   def row_win?
     count = 0
-    board.reverse.each do |row|
-      row.each do |cell|
-        if cell == active_player.piece
+    5.downto(0) do |r|
+      7.times do |c|
+        if board[r][c] == active_player.piece
           count += 1
         else 
           count = 0
@@ -117,6 +117,21 @@ class Game
     end
     return count == 4 ? true : false
   end
+
+  def diagonal_win?
+    count = 0
+    6.times do |r|
+      7.times do |c|
+        if board[r][c] == active_player.piece
+          count += 1
+        else
+          count = 0
+        end
+
+      end
+    end
+  end
+
 end
 
 #game = Game.new
